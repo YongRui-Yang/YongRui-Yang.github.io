@@ -29,15 +29,15 @@
                 var exp1_tmp5 = document.getElementById("exp1_tmp5");
                 var exp1_result3 = document.getElementById("exp1_result3");
                 
-                exp1_N.value = Math.round((+exp1_M.value) * 10 / (+exp1_Mgrid.value));
+                exp1_N.value = Math.round((exp1_M.value) * 10 / (exp1_Mgrid.value),-2);
                 exp1_tmp3.value = exp1_N.value;
-                exp1_tmp1.value = (+exp1_gridNum.value) + (+exp1_errorgridNum.value);
+                exp1_tmp1.value = (exp1_gridNum.value) + (exp1_errorgridNum.value);
                 exp1_tmp2.value = exp1_tmp1.value ;
-                exp1_result1.value = (+exp1_Total1.value) * (+exp1_tmp1.value);
+                exp1_result1.value = (exp1_Total1.value) * (exp1_tmp1.value);
                 exp1_tmp4.value = exp1_result1.value ;
-                exp1_result2.value = Math.round10((+exp1_Total2.value) * (+exp1_tmp2.value) / (+exp1_N.value),-2);
+                exp1_result2.value = Math.round((+exp1_Total2.value) * exp1_tmp2.value) / (exp1_N.value),-2);
                 exp1_tmp5.value = exp1_result2.value ;
-                exp1_result3.value = (+exp1_tmp4.value) - (+exp1_tmp5.value);
+                exp1_result3.value = (exp1_tmp4.value) - (exp1_tmp5.value);
             }
 
             function clicked2(){
@@ -58,15 +58,15 @@
                 var exp2_tmp5 = document.getElementById("exp2_tmp5");
                 var exp2_result3 = document.getElementById("exp2_result3");
                 
-                exp2_N.value = Math.round((+exp2_M.value) * 10 / (+exp2_Mgrid.value));
+                exp2_N.value = Math.round((+exp2_M.value) * 10 / (exp2_Mgrid.value));
                 exp2_tmp3.value = exp2_N.value;
-                exp2_tmp1.value = (+exp2_gridNum.value) + (+exp2_errorgridNum.value);
+                exp2_tmp1.value = (exp2_gridNum.value) + (exp2_errorgridNum.value);
                 exp2_tmp2.value = exp2_tmp1.value ;
-                exp2_result1.value = (+exp2_Total1.value) * (+exp2_tmp1.value);
+                exp2_result1.value = (exp2_Total1.value) * (exp2_tmp1.value);
                 exp2_tmp4.value = exp2_result1.value ;
-                exp2_result2.value = Math.round10((+exp2_Total2.value) * (+exp2_tmp2.value) / (+exp2_N.value),-2);
+                exp2_result2.value = Math.round((exp2_Total2.value) * (exp2_tmp2.value) / (exp2_N.value),-2);
                 exp2_tmp5.value = exp2_result2.value ;
-                exp2_result3.value = (+exp2_tmp4.value) - (+exp2_tmp5.value);
+                exp2_result3.value = (exp2_tmp4.value) - (exp2_tmp5.value);
             }
         </script>
         <!-- Boostrap5.0 導入程式 -->
