@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>數據處理工具</title>
+</head>
+<body>
+<h1>數據處理工具</h1>
+<textarea id="input1" rows="10" cols="50" placeholder="輸入數據1">
+GSM7876516		146.1
+GSM7876517		113.1
+GSM7876518		76.69
+GSM7876519		37.67
+GSM7876520		183.2
+GSM7876522		107.7
+GSM7876523		69.34
+GSM7876524		297.8
+GSM7876525		126.8
+GSM7876526		90.71
+GSM7876527		109.9
+GSM7876529		88.06
+GSM7876531		34.2
+GSM7876532		120.4
+GSM7876533		107.5
+GSM7876534		66.29
+GSM7876535		248.9
+GSM7876538		69.66
+GSM7876539		128.4
+GSM7876540		83.59
+GSM7876541		99.4
+GSM7876542		95.95
+GSM7876543		93.44
+GSM7876544		91.17
+</textarea>
+<textarea id="input2" rows="10" cols="50" placeholder="輸入數據2">
+GSM7876516 Osteoclast day 0 in vitro Donor 1
+GSM7876517 Osteoclast day 2 in vitro Donor 1
+GSM7876518 Osteoclast day 5 in vitro Donor 1
+GSM7876519 Osteoclast day 9 in vitro Donor 1
+GSM7876520 Osteoclast day 0 in vitro Donor 2
+GSM7876521 Osteoclast day 2 in vitro Donor 2
+GSM7876522 Osteoclast day 5 in vitro Donor 2
+GSM7876523 Osteoclast day 9 in vitro Donor 2
+GSM7876524 Osteoclast day 0 in vitro Donor 3
+GSM7876525 Osteoclast day 2 in vitro Donor 3
+GSM7876526 Osteoclast day 5 in vitro Donor 3
+GSM7876527 Osteoclast day 9 in vitro Donor 3
+GSM7876528 Osteoclast day 0 in vitro Donor 4
+GSM7876529 Osteoclast day 2 in vitro Donor 4
+GSM7876530 Osteoclast day 5 in vitro Donor 4
+GSM7876531 Osteoclast day 9 in vitro Donor 4
+GSM7876532 Osteoclast day 2 in vitro Donor 5
+GSM7876533 Osteoclast day 5 in vitro Donor 5
+GSM7876534 Osteoclast day 9 in vitro Donor 5
+GSM7876535 Osteoclast day 0 in vitro Donor 6
+GSM7876536 Osteoclast day 2 in vitro Donor 6
+GSM7876537 Osteoclast day 5 in vitro Donor 6
+GSM7876538 Osteoclast day 9 in vitro Donor 6
+GSM7876539 Osteoclast day 2 in vitro Donor 7
+GSM7876540 Osteoclast day 5 in vitro Donor 7
+GSM7876541 Osteoclast day 9 in vitro Donor 7
+GSM7876542 Osteoclast day 2 in vitro Donor 8
+GSM7876543 Osteoclast day 5 in vitro Donor 8
+GSM7876544 Osteoclast day 9 in vitro Donor 8
+</textarea>
+<button onclick="processData()">處理數據</button>
+<button onclick="downloadCSV()">下載 CSV</button>
+<pre id="output"></pre>
+<script src="process.js"></script>
+</body>
+</html>
