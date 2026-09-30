@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>營業額日報表</title>
+<style>
+  :root {
+    --bg: #e9e7e1; --paper: #fff; --ink: #111; --pen: #1f3fa8; --dash: #9a9a9a;
+    --input: #fffbe3; --auto: #eaf2ff; --muted: #666; --bad: #c62828;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 16px; }
+  .scroll { overflow-x: auto; }
+  .paper { background:var(--paper); padding: 24px 22px 28px; box-shadow: 0 2px 10px rgba(0,0,0,.18); min-width: 720px; }
+
+  table.form { width:100%; border-collapse:collapse; border:2px solid var(--ink); table-layout:fixed; }
+  .form td, .form th { border:1px solid var(--ink); padding:0 6px; height:32px; font-size:15px; font-weight:normal; }
+  .form .lbl { text-align:center; letter-spacing:1px; }
+  .form .title { text-align:center; font-size:18px; letter-spacing:2px; height:40px; position:relative; }
+  .title .wrap { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .title .wrap > span:first-child { white-space:nowrap; }
+  .title .wrap::before { content:""; width:215px; flex:none; }
+  .title .date { font-size:13px; display:flex; align-items:center; gap:4px; width:215px; flex:none; letter-spacing:0; white-space:nowrap; }
+  @media (max-width: 760px) {
+    main { padding: 8px; }
+    .paper { padding: 12px 10px 16px; min-width: 680px; }
+    .title .wrap::before { display:none; }
+  }
+  .title .date input { width:140px; font-size:14px; }
+  .memo .line { white-space:nowrap; }
+  .title .date .wx { width:44px; }
+  .form .thick-top td, .form .thick-top th { border-top:2px solid var(--ink); }
+  /* dashed inner lines like the paper */
+  .form td.dashed { border-top:1px dashed var(--dash); border-bottom:1px dashed var(--dash); }
+  .form tr.first-dashed td.dashed { border-top:1px solid var(--ink); }
+  .form tr.last-dashed td.dashed { border-bottom:1px solid var(--ink); }
+  .duty { text-align:center; vertical-align:middle; }
+  .duty input { writing-mode: horizontal-tb; }
+
+  input { width:100%; font:inherit; font-size:16px; border:none; border-radius:3px; background:var(--input); color:var(--pen); text-align:center; padding:3px 2px; min-width:0; font-family: "Segoe Print", "Bradley Hand", "Microsoft JhengHei", cursive; }
+  input:focus { outline:2px solid #7aa0ff; }
+  .out { background:var(--auto); border-radius:3px; text-align:center; padding:3px 2px; min-height:26px; font-size:16px; font-variant-numeric: tabular-nums; }
+  .neg { color:var(--bad); font-weight:700; }
+  .pair { display:flex; align-items:center; gap:3px; }
+  .pair input { flex:1; }
+  .hdr { display:flex; align-items:center; justify-content:center; gap:6px; }
+  .hdr input, .hdr .out { width:64px; flex:none; }
+  .mini { display:flex; align-items:center; gap:4px; font-size:12px; }
+  .mini span { white-space:nowrap; }
+  .mini input { font-size:14px; text-align:left; }
+  .memo td { height:auto; vertical-align:top; padding:6px 8px; }
+  .memo .line { display:flex; align-items:center; gap:6px; margin:4px 0; }
+  .memo input { text-align:left; }
+
+  .legend { font-size:13px; color:var(--muted); margin:0 0 10px; }
+  .legend span { display:inline-block; padding:1px 8px; border-radius:4px; margin-right:6px; color:var(--ink); }
+  .note { font-size:12px; color:var(--muted); margin-top:8px; }
+  .tools { margin-top:14px; background:var(--paper); padding:12px; border-radius:8px; }
+  .btns { display:flex; gap:8px; flex-wrap:wrap; }
+  button { font:inherit; padding:8px 14px; border-radius:8px; border:1px solid #bbb; background:#fff; cursor:pointer; }
+  button.primary { background:#2a62c9; color:#fff; border-color:#2a62c9; }
+  pre { white-space:pre-wrap; background:#f4f6fa; padding:10px; border-radius:8px; font-size:13px; }
+</style>
+</head>
+<body>
+<main>
+  <p class="legend"><span style="background:var(--input)">黃色 = 要填</span><span style="background:var(--auto)">藍色 = 自動算</span></p>
+
+  <div class="scroll"><div class="paper">
+    <table class="form">
+      <colgroup>
+        <col style="width:17%"><col style="width:20%"><col style="width:20%"><col style="width:20%"><col style="width:9%">
+      </colgroup>
+      <tr>
+        <td class="title" colspan="5"><div class="wrap"><span>營業額日報表</span>
+          <span class="date">日期:<input id="date" type="date"><input id="weather" class="wx" placeholder="晴"></span></div>
+        </td>
+      </tr>
+      <tr class="thick-top">
+        <th></th>
+        <th><div class="hdr">早班 <input id="cupsAM" inputmode="numeric" placeholder="杯"></div></th>
+        <th><div class="hdr">晚班 <div class="out" id="cupsPM"></div></div></th>
+        <th><div class="hdr">總計 <input id="cupsT" inputmode="numeric" placeholder="杯"></div></th>
+        <th class="lbl">早值</th>
+      </tr>
+      <tr class="first-dashed">
+        <td class="lbl">總營業額</td>
+        <td class="dashed"><input id="revAM" inputmode="numeric"></td>
+        <td class="dashed"><div class="out" id="revPM"></div></td>
+        <td class="dashed"><input id="revT" inputmode="numeric"></td>
+        <td class="duty" rowspan="5"><input id="dutyAM"></td>
+      </tr>
+      <tr>
+        <td class="lbl">現金</td>
+        <td class="dashed"><input id="cashAM" inputmode="numeric"></td>
+        <td class="dashed"><div class="out" id="cashPM"></div></td>
+        <td class="dashed"><input id="cashT" inputmode="numeric"></td>
+      </tr>
+      <tr>
+        <td class="lbl">DD代收現金</td>
+        <td class="dashed"><input id="ddAM" placeholder="✕"></td>
+        <td class="dashed"><input id="ddPM" placeholder="✕"></td>
+        <td class="dashed"><input id="ddT" placeholder="✕"></td>
+      </tr>
+      <tr class="last-dashed">
+        <td class="lbl">零用金撥補</td>
+        <td class="dashed"><input id="pettyAM" placeholder="✕"></td>
+        <td class="dashed"><input id="pettyPM" placeholder="✕"></td>
+        <td class="dashed"><input id="pettyT" placeholder="✕"></td>
+      </tr>
+      <tr>
+        <td class="lbl">實際存入金額</td>
+        <td><div class="out" id="deposit"></div></td>
+        <td class="lbl">累積營業額</td>
+        <td><input id="cumRev" inputmode="numeric"></td>
+      </tr>
+      <tr class="first-dashed">
+        <td class="lbl">外送筆數/金額</td>
+        <td class="dashed"><div class="pair"><input id="delNAM" inputmode="numeric">/<input id="delAAM" inputmode="numeric"></div></td>
+        <td class="dashed"><div class="out" id="delPM"></div></td>
+        <td class="dashed"><div class="pair"><input id="delNT" inputmode="numeric">/<input id="delAT" inputmode="numeric"></div></td>
+        <td class="lbl">晚值</td>
+      </tr>
+      <tr>
+        <td class="lbl">OC筆數/金額</td>
+        <td class="dashed"><div class="pair"><input id="ocNAM" inputmode="numeric">/<input id="ocAAM" inputmode="numeric"></div></td>
+        <td class="dashed"><div class="out" id="ocPM"></div></td>
+        <td class="dashed"><div class="pair"><input id="ocNT" inputmode="numeric">/<input id="ocAT" inputmode="numeric"></div></td>
+        <td class="duty" rowspan="6"><input id="dutyPM"></td>
+      </tr>
+      <tr>
+        <td class="lbl">總工時</td>
+        <td class="dashed"><input id="hrsAM" inputmode="decimal"></td>
+        <td class="dashed"><div class="out" id="hrsPM"></div></td>
+        <td class="dashed"><input id="hrsT" inputmode="decimal"></td>
+      </tr>
+      <tr class="last-dashed">
+        <td class="lbl">生產力/杯</td>
+        <td class="dashed"><div class="out" id="prodAM"></div></td>
+        <td class="dashed"><div class="out" id="prodPM"></div></td>
+        <td class="dashed"><div class="out" id="prodT"></div></td>
+      </tr>
+      <tr>
+        <td class="lbl">總來客數</td>
+        <td><input id="guests" inputmode="numeric"></td>
+        <td><div class="mini"><span>熊貓:</span><input id="panda"></div></td>
+        <td><div class="mini"><span>UBER:</span><input id="uber"></div></td>
+      </tr>
+      <tr>
+        <td class="lbl">總杯數</td>
+        <td><div class="out" id="cupsTotal"></div></td>
+        <td><div class="mini"><span>LinePay:</span><input id="linepay"></div></td>
+        <td><div class="mini"><span>你訂Linepay:</span><input id="nidingLinepay"></div></td>
+      </tr>
+      <tr>
+        <td class="lbl">誤差金額</td>
+        <td><div class="pair"><input id="errAM">/<input id="errPM"></div></td>
+        <td><div class="mini"><span>TWPay:</span><input id="twpay"></div></td>
+        <td><div class="mini"><span>街口:</span><input id="jkopay"></div></td>
+      </tr>
+      <tr class="memo thick-top">
+        <td colspan="5">
+          <div class="line">備註:<input id="memo"></div>
+          <div class="line">杯單:<div class="out" id="cupTickets" style="width:120px;flex:none"></div></div>
+        </td>
+      </tr>
+    </table>
+    <div class="note">晚班 = 總計 − 早班;生產力/杯 = 營業額 ÷ 工時 / 杯數 ÷ 工時(四捨五入到小數第一位);實際存入金額 = 總計現金;杯單 = 總營業額 ÷ 總計杯數(四捨五入到小數第一位)</div>
+  </div></div>
+
+  <div class="tools">
+    <div class="btns">
+      <button class="primary" id="copy">複製文字摘要</button>
+      <button id="clear">清空</button>
+    </div>
+    <pre id="summary"></pre>
+  </div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const num = id => { const v = $(id).value.trim(); return v === '' ? null : Number(v); };
+const sub = (a, b) => (a === null || b === null) ? null : Math.round((a - b) * 100) / 100;
+const roundDiv = (a, b) => (a === null || !b) ? null : (Math.round(a / b * 10) / 10).toFixed(1);
+const fmt = v => v === null || Number.isNaN(v) ? '' : String(v);
+const pair = (n, a) => (n === null && a === null) ? '' : `${fmt(n)}/${fmt(a)}`;
+const txt = id => $(id).value.trim();
+
+function setOut(id, v) {
+  const el = $(id);
+  el.textContent = typeof v === 'string' ? v : fmt(v);
+  el.classList.toggle('neg', typeof v === 'number' && v < 0);
+}
+
+const KEYS = ['date','weather','dutyAM','dutyPM','cupsAM','cupsT','revAM','revT','cashAM','cashT',
+  'ddAM','ddPM','ddT','pettyAM','pettyPM','pettyT',
+  'delNAM','delAAM','delNT','delAT','ocNAM','ocAAM','ocNT','ocAT','hrsAM','hrsT',
+  'cumRev','guests','errAM','errPM','memo',
+  'panda','uber','linepay','nidingLinepay','twpay','jkopay'];
+
+function calc() {
+  const cupsPM = sub(num('cupsT'), num('cupsAM'));
+  const revPM  = sub(num('revT'),  num('revAM'));
+  const cashPM = sub(num('cashT'), num('cashAM'));
+  const hrsPM  = sub(num('hrsT'),  num('hrsAM'));
+  const delNPM = sub(num('delNT'), num('delNAM')), delAPM = sub(num('delAT'), num('delAAM'));
+  const ocNPM  = sub(num('ocNT'),  num('ocNAM')),  ocAPM  = sub(num('ocAT'),  num('ocAAM'));
+
+  setOut('cupsPM', cupsPM); setOut('revPM', revPM); setOut('cashPM', cashPM); setOut('hrsPM', hrsPM);
+  setOut('delPM', pair(delNPM, delAPM)); setOut('ocPM', pair(ocNPM, ocAPM));
+
+  const prod = (r, c, h) => (r === null && c === null) || !h ? '' : `${fmt(roundDiv(r, h))}/${fmt(roundDiv(c, h))}`;
+  const pAM = prod(num('revAM'), num('cupsAM'), num('hrsAM'));
+  const pPM = prod(revPM, cupsPM, hrsPM);
+  const pT  = prod(num('revT'),  num('cupsT'),  num('hrsT'));
+  setOut('prodAM', pAM); setOut('prodPM', pPM); setOut('prodT', pT);
+
+  setOut('deposit', num('cashT'));
+  setOut('cupsTotal', num('cupsT'));
+  // 杯單 = 總計營業額 ÷ 總計杯數,四捨五入到小數第一位
+  const cupTickets = roundDiv(num('revT'), num('cupsT'));
+  setOut('cupTickets', cupTickets);
+
+  const d = $('date').value;
+  const dateStr = d ? `${+d.slice(5,7)}/${+d.slice(8,10)}` : '';
+  const x = v => v || '✕';
+  $('summary').textContent =
+`營業額日報表 ${dateStr} ${txt('weather')}
+早值:${txt('dutyAM')}  晚值:${txt('dutyPM')}
+          早班 / 晚班 / 總計
+杯數:     ${fmt(num('cupsAM'))} / ${fmt(cupsPM)} / ${fmt(num('cupsT'))}
+總營業額: ${fmt(num('revAM'))} / ${fmt(revPM)} / ${fmt(num('revT'))}
+現金:     ${fmt(num('cashAM'))} / ${fmt(cashPM)} / ${fmt(num('cashT'))}
+DD代收現金:${x(txt('ddAM'))} / ${x(txt('ddPM'))} / ${x(txt('ddT'))}
+零用金撥補:${x(txt('pettyAM'))} / ${x(txt('pettyPM'))} / ${x(txt('pettyT'))}
+實際存入金額:${fmt(num('cashT'))}
+累積營業額:${fmt(num('cumRev'))}
+外送:     ${pair(num('delNAM'),num('delAAM'))} / ${pair(delNPM,delAPM)} / ${pair(num('delNT'),num('delAT'))}
+OC:       ${pair(num('ocNAM'),num('ocAAM'))} / ${pair(ocNPM,ocAPM)} / ${pair(num('ocNT'),num('ocAT'))}
+總工時:   ${fmt(num('hrsAM'))} / ${fmt(hrsPM)} / ${fmt(num('hrsT'))}
+生產力/杯:${pAM} / ${pPM} / ${pT}
+總來客數:${fmt(num('guests'))}
+總杯數:${fmt(num('cupsT'))}
+誤差金額:${txt('errAM')}/${txt('errPM')}
+熊貓:${txt('panda')}  UBER:${txt('uber')}
+LinePay:${txt('linepay')}  你訂Linepay:${txt('nidingLinepay')}
+TWPay:${txt('twpay')}  街口:${txt('jkopay')}
+備註:${txt('memo')}
+杯單:${fmt(cupTickets)}`;
+
+  try { localStorage.setItem('dailyReport', JSON.stringify(Object.fromEntries(KEYS.map(k => [k, $(k).value])))); } catch (e) {}
+}
+
+try {
+  const saved = JSON.parse(localStorage.getItem('dailyReport') || '{}');
+  KEYS.forEach(k => { if (saved[k] != null) $(k).value = saved[k]; });
+} catch (e) {}
+if (!$('date').value) $('date').value = new Date().toLocaleDateString('sv');
+
+KEYS.forEach(k => $(k).addEventListener('input', calc));
+$('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText($('summary').textContent); $('copy').textContent = '已複製 ✓'; }
+  catch (e) { $('copy').textContent = '複製失敗'; }
+  setTimeout(() => $('copy').textContent = '複製文字摘要', 1500);
+};
+$('clear').onclick = () => {
+  if (!confirm('確定清空所有欄位?')) return;
+  KEYS.forEach(k => $(k).value = '');
+  $('date').value = new Date().toLocaleDateString('sv');
+  calc();
+};
+calc();
+</script>
+</body>
+</html>
